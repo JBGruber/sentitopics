@@ -2,7 +2,7 @@
 % Please edit documentation in R/jstManyRuns.R
 \name{jstManyRuns}
 \alias{jstManyRuns}
-\title{Run a Joint Sentiment Topic Model Several Times}
+\title{Estimate Sentiment Labels with the Joint Sentiment Topic Model Several Times}
 \usage{
 jstManyRuns(
   dfm,
@@ -22,31 +22,36 @@ jstManyRuns(
 )
 }
 \arguments{
-\item{dfm}{A quanteda dfm object}
+\item{dfm}{A quanteda "dfm" (document-feature matrix) object containing the
+text data.}
 
-\item{sentiLexInput}{Optional: A quanteda dictionary object for semi-supervised learning. If
-a dictionary is used, \code{numSentiLabs} will be overridden by the number of categories in the
-dictionary object. An extra category will by default be added for neutral words. This can be
-turned off by setting \code{excludeNeutral = TRUE}.}
+\item{sentiLexInput}{Optional: A quanteda dictionary object for
+semi-supervised learning. If provided, the sentiment labels will be
+inferred from this dictionary, overriding \code{numSentiLabs}. By default,
+an additional neutral category is included. To exclude, set \code{excludeNeutral =
+TRUE}.}
 
-\item{numSentiLabs}{Integer, the number of sentiment labels (defaults to 3)}
+\item{numSentiLabs}{Number of sentiment labels. Default is 3.}
 
-\item{numTopics}{Integer, the number of topics (defaults to 10)}
+\item{numTopics}{Number of topics to extract from the data. Default is 10.}
 
-\item{numIters}{Integer, the number of iterations (defaults to 3 for test runs, optimize by hand)}
+\item{numIters}{Number of iterations for the Gibbs sampler. Set to 3 for test
+runs. Adjust as needed for real data.}
 
-\item{updateParaStep}{Integer. The number of iterations between optimizations of hyperparameter alpha}
+\item{updateParaStep}{Number of iterations between updates of the
+hyperparameter alpha.}
 
-\item{alpha}{Double, hyperparameter for (defaults to .05 * (average docsize/number of sentitopics))}
+\item{alpha}{Hyperparameter for topic distributions. If not set, it will be
+calculated using the formula provided.}
 
-\item{beta}{Double, hyperparameter for (defaults to .01, with multiplier .9/.1 for sentiment dictionary presence)}
+\item{beta}{Hyperparameter for sentiment-topic word distributions. Default is
+based on sentiment dictionary presence.}
 
-\item{gamma}{Double, hyperparameter for (defaults to .05 * (average docsize/number of sentiment categories))}
+\item{gamma}{Hyperparameter for document-topic distributions. If not set, it
+will be calculated using the formula provided.}
 
-\item{excludeNeutral}{Boolean. If a dictionary is used, an extra category is added for neutral
-words. Words in the dictionary receive a low probability of being allocated there. If this is set
-to \code{TRUE}, the neutral sentiment category will be omitted. The variable is irrelevant if no
-dictionary is used. Defaults to \code{FALSE}.}
+\item{excludeNeutral}{Boolean flag to determine if neutral sentiment category
+should be excluded. Default is \code{FALSE}.}
 
 \item{n}{Number of model runs (defaults to 30)}
 
@@ -60,17 +65,46 @@ dictionary is used. Defaults to \code{FALSE}.}
 A data.frame with mean sentiment label predictions and uncertainty estimates
 }
 \description{
-Estimates a joint sentiment topic model n times and returns mean sentiment label predictions, see Details for model description.
+This function runs the Joint Sentiment Topic (JST) model multiple times and
+provides an average sentiment label prediction for each run.
 }
 \details{
-Works similarly to \code{\link{jst}}, but runs the model estimation n times using parallelization. 
-Does not return the full results of each individual model, but mean sentiment label predictions 
-with uncertainty estimates.
+Instead of running the JST model once, this function runs it 'n' times in
+parallel. Instead of the full results, this function provides the average
+sentiment label predictions with associated uncertainty estimates. For the
+foundational model's details, please refer to the \code{\link{jst}}
+function's documentation.
+
+\strong{Advantages}:
+\itemize{
+  \item \strong{Improved Robustness}: Multiple runs can capture a more accurate representation of the underlying data structure by averaging out the noise.
+  \item \strong{Uncertainty Estimation}: Provides a measure of variability in sentiment predictions, offering insights into the reliability of the results.
+  \item \strong{Parallel Processing}: Utilizes parallel processing for faster computations, especially beneficial for large datasets or complex models.
+}
+
+\strong{Disadvantages}:
+\itemize{
+  \item \strong{Computational Cost}: Requires more computational resources due to multiple runs.
+  \item \strong{Memory Usage}: Might increase memory demand especially if the dataset is large.
+  \item \strong{Results Interpretation}: Provides average values rather than full model details, which might be limiting if detailed model analysis is needed.
+}
 }
 \examples{
-results <- jstManyRuns(quanteda::dfm(quanteda::data_corpus_irishbudget2010),
-             paradigm(),
-             numTopics = 5,
-             numIters = 15, # Use more in practice!
-             n = 5) # Use more in practice!
+\dontrun{
+library(quanteda)
+library(quanteda.textmodels)
+data_irishbudget2010 <- data_corpus_irishbudget2010 \%>\% 
+  tokens() \%>\% 
+  dfm()
+
+model <- jstManyRuns(data_irishbudget2010, 
+                     sentiLexInput = paradigm(), 
+                     numTopics = 5, 
+                     numIters = 150,
+                     n = 5,
+                     confidence = 0.95,
+                     ncores = 4,
+                     seed = 123456)
+}
+
 }

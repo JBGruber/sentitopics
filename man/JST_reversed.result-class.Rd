@@ -6,7 +6,8 @@
 \alias{JST_reversed.result}
 \title{Reverse JST results object}
 \description{
-Contains estimated reversed Joint Sentiment Topic model, see Details for model description.
+Contains estimated reversed Joint Sentiment Topic model, see
+  \link{jst_reversed} for model description.
 }
 \section{Slots}{
 
@@ -17,7 +18,8 @@ Contains estimated reversed Joint Sentiment Topic model, see Details for model d
 
 \item{\code{phi}}{Word-level sentitopic estimates}
 
-\item{\code{phi.termScores}}{Word-level term scores (suboptimal calculation, only useful for smaller models)}
+\item{\code{phi.termScores}}{Word-level term scores (suboptimal calculation, only
+useful for smaller models)}
 
 \item{\code{numTopics}}{Number of topics}
 

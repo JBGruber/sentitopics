@@ -7,16 +7,28 @@
 paradigm()
 }
 \value{
-A quanteda dictionary2 object containing the paradigm word list
+A quanteda dictionary object containing the paradigm word list
 }
 \description{
-Returns the paradigm word list proposed by Lin and He. These words create groupings
-of positive and negative words which are considered to be domain-independent. However,
-as always, caution is warranted. The words are mostly suited for review analysis. Review
-the words before applying the dictionary.
+This function returns a list of positive and negative words known as the
+"paradigm word list," which was proposed by Lin and He (2009). This list is
+considered to be domain-independent and is mostly used for sentiment analysis
+in reviews. However, it is important to review the words in the list before
+using it as a dictionary. See \link[quanteda]{dictionary} for more
+information about the returned object.
 }
 \note{
-Lin, C., & He, Y. (2009). Joint sentiment/topic model for sentiment analysis. 
-In Proceedings of the 18th ACM conference on Information and knowledge management 
-(pp. 375-384). ACM.
+Lin, C., & He, Y. (2009). Joint sentiment/topic model for sentiment
+  analysis. In Proceedings of the 18th ACM conference on Information and
+  knowledge management (pp. 375-384). ACM.
+}
+\examples{
+# Load the paradigm word list
+paradigm_dict <- paradigm()
+
+# add words to dictionary
+paradigm_dict$positive <- c(paradigm_dict$positive, "best")
+
+# remove words from dictionary
+paradigm_dict$positive <- setdiff(paradigm_dict$positive, "best")
 }

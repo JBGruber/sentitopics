@@ -1,39 +1,54 @@
-#' Run a Joint Sentiment Topic Model Several Times
+#' Estimate Sentiment Labels with the Joint Sentiment Topic Model Several Times
 #'
-#' Estimates a joint sentiment topic model n times and returns mean sentiment label predictions, see Details for model description.
+#' This function runs the Joint Sentiment Topic (JST) model multiple times and
+#' provides an average sentiment label prediction for each run.
 #'
-#' Works similarly to \code{\link{jst}}, but runs the model estimation n times using parallelization. 
-#' Does not return the full results of each individual model, but mean sentiment label predictions 
-#' with uncertainty estimates.
+#' @details Instead of running the JST model once, this function runs it 'n' times in
+#' parallel. Instead of the full results, this function provides the average
+#' sentiment label predictions with associated uncertainty estimates. For the
+#' foundational model's details, please refer to the \code{\link{jst}}
+#' function's documentation.
+#' 
+#' \strong{Advantages}:
+#' \itemize{
+#'   \item \strong{Improved Robustness}: Multiple runs can capture a more accurate representation of the underlying data structure by averaging out the noise.
+#'   \item \strong{Uncertainty Estimation}: Provides a measure of variability in sentiment predictions, offering insights into the reliability of the results.
+#'   \item \strong{Parallel Processing}: Utilizes parallel processing for faster computations, especially beneficial for large datasets or complex models.
+#' }
 #'
-#' @param dfm A quanteda dfm object
-#' @param sentiLexInput Optional: A quanteda dictionary object for semi-supervised learning. If
-#' a dictionary is used, \code{numSentiLabs} will be overridden by the number of categories in the
-#' dictionary object. An extra category will by default be added for neutral words. This can be
-#' turned off by setting \code{excludeNeutral = TRUE}.
-#' @param numSentiLabs Integer, the number of sentiment labels (defaults to 3)
-#' @param numTopics Integer, the number of topics (defaults to 10)
-#' @param numIters Integer, the number of iterations (defaults to 3 for test runs, optimize by hand)
-#' @param updateParaStep Integer. The number of iterations between optimizations of hyperparameter alpha
-#' @param alpha Double, hyperparameter for (defaults to .05 * (average docsize/number of sentitopics))
-#' @param beta Double, hyperparameter for (defaults to .01, with multiplier .9/.1 for sentiment dictionary presence)
-#' @param gamma Double, hyperparameter for (defaults to .05 * (average docsize/number of sentiment categories))
-#' @param excludeNeutral Boolean. If a dictionary is used, an extra category is added for neutral
-#' words. Words in the dictionary receive a low probability of being allocated there. If this is set
-#' to \code{TRUE}, the neutral sentiment category will be omitted. The variable is irrelevant if no
-#' dictionary is used. Defaults to \code{FALSE}.
+#' \strong{Disadvantages}:
+#' \itemize{
+#'   \item \strong{Computational Cost}: Requires more computational resources due to multiple runs.
+#'   \item \strong{Memory Usage}: Might increase memory demand especially if the dataset is large.
+#'   \item \strong{Results Interpretation}: Provides average values rather than full model details, which might be limiting if detailed model analysis is needed.
+#' }
+#' 
+#' @inheritParams jst
 #' @param n Number of model runs (defaults to 30)
 #' @param confidence Confidence level for confidence intervals (defaults to 0.95)
 #' @param ncores Number of (logical) CPU cores used for the estimation. (defaults to available number of cores - 3)
 #' @param seed Seed for random number generator for reproducibility (defaults to \code{NA})
+#' 
 #' @return A data.frame with mean sentiment label predictions and uncertainty estimates
 #'
 #' @examples
-#' results <- jstManyRuns(quanteda::dfm(quanteda::data_corpus_irishbudget2010),
-#'              paradigm(),
-#'              numTopics = 5,
-#'              numIters = 15, # Use more in practice!
-#'              n = 5) # Use more in practice!
+#' \dontrun{
+#' library(quanteda)
+#' library(quanteda.textmodels)
+#' data_irishbudget2010 <- data_corpus_irishbudget2010 %>% 
+#'   tokens() %>% 
+#'   dfm()
+#' 
+#' model <- jstManyRuns(data_irishbudget2010, 
+#'                      sentiLexInput = paradigm(), 
+#'                      numTopics = 5, 
+#'                      numIters = 150,
+#'                      n = 5,
+#'                      confidence = 0.95,
+#'                      ncores = 4,
+#'                      seed = 123456)
+#' }
+#' 
 #' @export
 jstManyRuns <- function(dfm,
                         sentiLexInput = NULL,

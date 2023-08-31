@@ -2,7 +2,7 @@
 % Please edit documentation in R/jst_reversed.R
 \name{jst_reversed}
 \alias{jst_reversed}
-\title{Run a reversed Joint Sentiment Topic model}
+\title{Run a Reversed Joint Sentiment Topic (JST) Model}
 \usage{
 jst_reversed(
   dfm,
@@ -18,48 +18,61 @@ jst_reversed(
 )
 }
 \arguments{
-\item{dfm}{A quanteda dfm object}
+\item{dfm}{A quanteda "dfm" (document-feature matrix) object containing the
+text data.}
 
-\item{sentiLexInput}{Optional: A quanteda dictionary object for semi-supervised learning. If
-a dictionary is used, \code{numSentiLabs} will be overridden by the number of categories in the
-dictionary object. An extra category will by default be added for neutral words. This can be
-turned off by setting \code{excludeNeutral = TRUE}.}
+\item{sentiLexInput}{Optional: A quanteda dictionary object for
+semi-supervised learning. If provided, the sentiment labels will be
+inferred from this dictionary, overriding \code{numSentiLabs}. By default,
+an additional neutral category is included. To exclude, set \code{excludeNeutral =
+TRUE}.}
 
-\item{numSentiLabs}{Integer, the number of sentiment labels (defaults to 3)}
+\item{numSentiLabs}{Number of sentiment labels. Default is 3.}
 
-\item{numTopics}{Integer, the number of topics (defaults to 10)}
+\item{numTopics}{Number of topics to extract from the data. Default is 10.}
 
-\item{numIters}{Integer, the number of iterations (defaults to 3 for test runs, optimize by hand)}
+\item{numIters}{Number of iterations for the Gibbs sampler. Set to 3 for test
+runs. Adjust as needed for real data.}
 
-\item{updateParaStep}{Integer. The number of iterations between optimizations
-of hyperparameter alpha}
+\item{updateParaStep}{Number of iterations between updates of the
+hyperparameter alpha.}
 
-\item{alpha}{Double, hyperparameter for (defaults to .05*(average docsize/number of topics))}
+\item{alpha}{Hyperparameter for topic distributions. If not set, it will be
+calculated using the formula provided.}
 
-\item{beta}{Double, hyperparameter for (defaults to .01, with multiplier .9/.1 for sentiment dictionary presence)}
+\item{beta}{Hyperparameter for sentiment-topic word distributions. Default is
+based on sentiment dictionary presence.}
 
-\item{gamma}{Double, hyperparameter for (defaults to .05 * (average docsize/number of sentitopics)}
+\item{gamma}{Hyperparameter for document-topic distributions. If not set, it
+will be calculated using the formula provided.}
 
-\item{excludeNeutral}{Boolean. If a dictionary is used, an extra category is added for neutral
-words. Words in the dictionary receive a low probability of being allocated there. If this is set
-to \code{TRUE}, the neutral sentiment category will be omitted. The variable is irrelevant if no
-dictionary is used. Defaults to \code{FALSE}.}
+\item{excludeNeutral}{Boolean flag to determine if neutral sentiment category
+should be excluded. Default is \code{FALSE}.}
 }
 \value{
-A JST_reversed.result object containing a data.frame for each estimated
-parameter
+A JST_reversed.result. See \link{JST_reversed.result}
 }
 \description{
-Estimates a reversed joint sentiment topic model using a Gibbs sampler, see Details for model description.
+This function implements the Reversed Joint Sentiment Topic model based on
+the Gibbs sampling method. For the theoretical background, refer to the paper
+by Lin et al. (2012).
 }
-\details{
-Lin, C., He, Y., Everson, R. and Ruger, S., 2012. Weakly supervised joint sentiment-topic
-detection from text. IEEE Transactions on Knowledge and Data engineering, 24(6), pp.1134-1145.
+\note{
+For detailed model description, refer to: Lin, C., He, Y., Everson, R.
+  & Ruger, S. (2012). Weakly supervised joint sentiment-topic detection from
+  text. IEEE Transactions on Knowledge and Data engineering, 24(6),
+  pp.1134-1145.
 }
 \examples{
-model <- jst(quanteda::dfm(quanteda::data_corpus_irishbudget2010),
-             paradigm(),
-             numTopics = 5,
-             numIters = 150)
+\dontrun{
+library(quanteda)
+library(quanteda.textmodels)
+data_irishbudget2010 <- data_corpus_irishbudget2010 \%>\%
+  tokens() \%>\%
+  dfm()
+
+model <- jst_reversed(data_irishbudget2010, sentiLexInput = paradigm(), numTopics = 5, numIters = 150)
+model
+}
 
 }

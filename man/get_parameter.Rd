@@ -2,27 +2,51 @@
 % Please edit documentation in R/get_parameter.R
 \name{get_parameter}
 \alias{get_parameter}
-\title{Get parameter from (reversed) JST results}
+\title{Extract and Tidy Parameters from Estimated Joint Sentiment-Topic (JST)
+Models}
 \usage{
 get_parameter(x, parameter = NULL)
 }
 \arguments{
-\item{x}{A JST_reversed.result or JST.result object}
+\item{x}{An object of class \code{JST.result} or \code{JST_reversed.result},
+representing the estimated JST model.}
 
-\item{parameter}{Character. The parameter to be tidied and returned.
-Note that no default is set.}
+\item{parameter}{A character string specifying the parameter to extract and
+tidy. There is no default value, you must specify one of these options:
+- "phi": Topic-word distribution
+- "theta": Document-topic distribution
+- "pi": Document-sentiment distribution}
 }
 \value{
-A data.frame.
+A tidy data.frame containing the selected parameter.
 }
 \description{
-Take the results object for the selected parameter
-and return a data.frame which is similar to tidy standards.
+\code{get_parameter()} is a convenient function for extracting a
+specific parameter from the results of a Joint Sentiment-Topic model,
+computed using either \code{JST.result} or \code{JST_reversed.result} objects. The
+extracted parameter is returned as a tidy data.frame, easy to manipulate,
+analyze, and visualize.
 }
 \examples{
-data <- quanteda::dfm(quanteda::data_corpus_irishbudget2010)
+\dontrun{
+# Load required libraries and data
+library(quanteda)
+library(quanteda.textmodels)
+data <- data_corpus_irishbudget2010 \%>\%
+  tokens() \%>\%
+  dfm()
+
+# Estimate a JST model with 5 topics and 50 iterations
 model <- jst(data, paradigm(), numTopics = 5, numIters = 50)
 
-phi <- get_parameter(model, 'phi')
+# Extract and tidy different parameters from the estimated model
+phi <- get_parameter(model, "phi")    # Topic-word distribution
+theta <- get_parameter(model, "theta") # Document-topic distribution
+pi <- get_parameter(model, "pi")      # Document-sentiment distribution
 
+# Explore the tidy parameter data.frames
+head(phi)
+head(theta)
+head(pi)
+}
 }

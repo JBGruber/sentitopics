@@ -3,17 +3,19 @@
 
 #' @title Reverse JST results object
 #'
-#' @description Contains estimated reversed Joint Sentiment Topic model, see Details for model description.
+#' @description Contains estimated reversed Joint Sentiment Topic model, see
+#'   \link{jst_reversed} for model description.
 #'
 #' @slot pi Document-level topic estimates
 #' @slot theta Document-level sentitopic estimates
 #' @slot phi Word-level sentitopic estimates
-#' @slot phi.termScores Word-level term scores (suboptimal calculation, only useful for smaller models)
+#' @slot phi.termScores Word-level term scores (suboptimal calculation, only
+#'   useful for smaller models)
 #' @slot numTopics Number of topics
 #' @slot numSentiments Number of sentiment categories
 #' @slot docvars Document-level metadata from the quanteda object used as input
 JST_reversed.result <- setClass(
-  'JST_reversed.result',
+  "JST_reversed.result",
   representation(
     pi = "data.frame",
     theta = "data.frame",
@@ -37,38 +39,32 @@ is.JST_reversed.result <- function(x) {
 }
 
 
-#' Run a reversed Joint Sentiment Topic model
+#' Run a Reversed Joint Sentiment Topic (JST) Model
 #'
-#' Estimates a reversed joint sentiment topic model using a Gibbs sampler, see Details for model description.
+#' This function implements the Reversed Joint Sentiment Topic model based on
+#' the Gibbs sampling method. For the theoretical background, refer to the paper
+#' by Lin et al. (2012).
 #'
-#' Lin, C., He, Y., Everson, R. and Ruger, S., 2012. Weakly supervised joint sentiment-topic
-#' detection from text. IEEE Transactions on Knowledge and Data engineering, 24(6), pp.1134-1145.
+#' @inheritParams jst
 #'
-#' @param dfm A quanteda dfm object
-#' @param sentiLexInput Optional: A quanteda dictionary object for semi-supervised learning. If
-#' a dictionary is used, \code{numSentiLabs} will be overridden by the number of categories in the
-#' dictionary object. An extra category will by default be added for neutral words. This can be
-#' turned off by setting \code{excludeNeutral = TRUE}.
-#' @param numSentiLabs Integer, the number of sentiment labels (defaults to 3)
-#' @param numTopics Integer, the number of topics (defaults to 10)
-#' @param numIters Integer, the number of iterations (defaults to 3 for test runs, optimize by hand)
-#' @param updateParaStep Integer. The number of iterations between optimizations
-#' of hyperparameter alpha
-#' @param alpha Double, hyperparameter for (defaults to .05*(average docsize/number of topics))
-#' @param beta Double, hyperparameter for (defaults to .01, with multiplier .9/.1 for sentiment dictionary presence)
-#' @param gamma Double, hyperparameter for (defaults to .05 * (average docsize/number of sentitopics)
-#' @param excludeNeutral Boolean. If a dictionary is used, an extra category is added for neutral
-#' words. Words in the dictionary receive a low probability of being allocated there. If this is set
-#' to \code{TRUE}, the neutral sentiment category will be omitted. The variable is irrelevant if no
-#' dictionary is used. Defaults to \code{FALSE}.
-#' @return A JST_reversed.result object containing a data.frame for each estimated
-#' parameter
+#' @return A JST_reversed.result. See \link{JST_reversed.result}
+#'
+#' @note For detailed model description, refer to: Lin, C., He, Y., Everson, R.
+#'   & Ruger, S. (2012). Weakly supervised joint sentiment-topic detection from
+#'   text. IEEE Transactions on Knowledge and Data engineering, 24(6),
+#'   pp.1134-1145.
 #'
 #' @examples
-#' model <- jst(quanteda::dfm(quanteda::data_corpus_irishbudget2010),
-#'              paradigm(),
-#'              numTopics = 5,
-#'              numIters = 150)
+#' \dontrun{
+#' library(quanteda)
+#' library(quanteda.textmodels)
+#' data_irishbudget2010 <- data_corpus_irishbudget2010 %>%
+#'   tokens() %>%
+#'   dfm()
+#'
+#' model <- jst_reversed(data_irishbudget2010, sentiLexInput = paradigm(), numTopics = 5, numIters = 150)
+#' model
+#' }
 #'
 #' @export
 jst_reversed <- function(dfm,

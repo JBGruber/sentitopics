@@ -1,23 +1,47 @@
 #' @include jst.R jst_reversed.R
 
-#' @title Get parameter from (reversed) JST results
+#' @title Extract and Tidy Parameters from Estimated Joint Sentiment-Topic (JST)
+#'   Models
 #'
-#' @description Take the results object for the selected parameter
-#' and return a data.frame which is similar to tidy standards.
+#' @description `get_parameter()` is a convenient function for extracting a
+#'   specific parameter from the results of a Joint Sentiment-Topic model,
+#'   computed using either `JST.result` or `JST_reversed.result` objects. The
+#'   extracted parameter is returned as a tidy data.frame, easy to manipulate,
+#'   analyze, and visualize.
 #'
-#' @param x A JST_reversed.result or JST.result object
-#' @param parameter Character. The parameter to be tidied and returned.
-#'        Note that no default is set.
+#' @param x An object of class `JST.result` or `JST_reversed.result`,
+#'   representing the estimated JST model.
+#' @param parameter A character string specifying the parameter to extract and
+#'   tidy. There is no default value, you must specify one of these options:
+#'   "phi" (Topic-word distribution), "theta" (Document-topic distribution),
+#'    or "pi" (Document-sentiment distribution).
 #'
-#' @return A data.frame.
+#' @return A tidy data.frame containing the selected parameter.
 #'
 #' @examples
-#' data <- quanteda::dfm(quanteda::data_corpus_irishbudget2010)
+#' \dontrun{
+#' # Load required libraries and data
+#' library(quanteda)
+#' library(quanteda.textmodels)
+#' data <- data_corpus_irishbudget2010 %>%
+#'   tokens() %>%
+#'   dfm()
+#'
+#' # Estimate a JST model with 5 topics and 50 iterations
 #' model <- jst(data, paradigm(), numTopics = 5, numIters = 50)
 #'
-#' phi <- get_parameter(model, 'phi')
+#' # Extract and tidy different parameters from the estimated model
+#' phi <- get_parameter(model, "phi")    # Topic-word distribution
+#' theta <- get_parameter(model, "theta") # Document-topic distribution
+#' pi <- get_parameter(model, "pi")      # Document-sentiment distribution
 #'
+#' # Explore the tidy parameter data.frames
+#' head(phi)
+#' head(theta)
+#' head(pi)
+#' }
 #' @export
+#' @md
 get_parameter <- function(x, parameter = NULL) {
   if (is.JST_reversed.result(x)) {
     if (is.null(parameter)) {

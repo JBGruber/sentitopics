@@ -2,9 +2,9 @@
 % Please edit documentation in R/dictionary.R
 \name{dictionary_wordstem}
 \alias{dictionary_wordstem}
-\title{Wordstem a quanteda Dictionary2 object}
+\title{Wordstem a quanteda Dictionary object}
 \usage{
-dictionary_wordstem(dict)
+dictionary_wordstem(dict, language = "porter")
 }
 \arguments{
 \item{dict}{A quanteda dictionary2 object}
@@ -13,6 +13,20 @@ dictionary_wordstem(dict)
 A quanteda dictionary2 object with all elements stemmed
 }
 \description{
-Applies Porter stemming to the words in a quanteda dictionary and then removes 
+Applies Porter stemming to the words in a \link[quanteda]{dictionary} and then removes 
 duplicates, if the stemming created these.
+}
+\examples{
+# Load the paradigm word list
+paradigm_dict <- paradigm()
+
+# Stem the words in the paradigm word list dictionary
+stemmed_paradigm_dict <- dictionary_wordstem(paradigm_dict)
+
+# Create a simple dictionary
+simple_dict <- quanteda::dictionary(list(positive = c("good", "great", "excellent"),
+negative = c("bad", "terrible", "awful")))
+
+# Stem the words in the simple dictionary
+stemmed_simple_dict <- dictionary_wordstem(simple_dict)
 }
